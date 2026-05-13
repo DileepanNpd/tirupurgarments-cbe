@@ -15,7 +15,7 @@
                     <div v-if="order?.invoice_number?.startsWith('SALE-')">
                         <h2>GST: {{ selectedWarehouse.address }}</h2>
                     </div>
-                    <h2>{{ selectedWarehouse.name }}</h2>
+                    <!--<h2>{{ selectedWarehouse.name }}</h2>-->
                     <h4 style="margin-bottom: 0px">
                         {{ $t("common.phone") }}: {{ selectedWarehouse.phone }}
                     </h4>
@@ -118,19 +118,6 @@
                                     :colspan="
                                         selectedWarehouse.show_mrp_on_invoice ? 4 : 3
                                     "
-                                    style="text-align: right; padding-right:5px; "
-                                >
-                                    {{ $t("stock.order_tax") }}
-                                </td>
-                                <td colspan="2" style="text-align: right; padding-right:5px;">
-                                    {{ formatAmountCurrency(order.tax_amount) }}
-                                </td>
-                            </tr>
-                            <tr class="item-row-other">
-                                <td
-                                    :colspan="
-                                        selectedWarehouse.show_mrp_on_invoice ? 4 : 3
-                                    "
                                     style="text-align: right; padding-right:5px;"
                                 >
                                     {{ $t("stock.discount") }}
@@ -150,6 +137,32 @@
                                 </td>
                                 <td colspan="2" style="text-align: right; padding-right:5px;">
                                     {{ formatAmountCurrency(order.shipping) }}
+                                </td>
+                            </tr>
+                            <tr class="item-row-other">
+                                <td
+                                    :colspan="
+                                        selectedWarehouse.show_mrp_on_invoice ? 4 : 3
+                                    "
+                                    style="text-align: right; padding-right:5px; "
+                                >
+                                    CGST 2.5%
+                                </td>
+                                <td colspan="2" style="text-align: right; padding-right:5px;">
+                                    {{ formatAmountCurrency(halfTaxAmount) }}
+                                </td>
+                            </tr>
+                            <tr class="item-row-other">
+                                <td
+                                    :colspan="
+                                        selectedWarehouse.show_mrp_on_invoice ? 4 : 3
+                                    "
+                                    style="text-align: right; padding-right:5px; "
+                                >
+                                    SGST 2.5%
+                                </td>
+                                <td colspan="2" style="text-align: right; padding-right:5px;">
+                                    {{ formatAmountCurrency(halfTaxAmount) }}
                                 </td>
                             </tr>
                         </tbody>
@@ -336,6 +349,12 @@ export default defineComponent({
             return `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(data)}`;
         });
 
+        // Half of the order tax — used to display CGST and SGST separately on the invoice
+        const halfTaxAmount = computed(() => {
+            const total = parseFloat(props.order?.tax_amount);
+            return isNaN(total) ? 0 : total / 2;
+        });
+
         return {
             onClose,
             formatDate,
@@ -343,6 +362,7 @@ export default defineComponent({
             formatAmountCurrency,
             printInvoice,
             upiLink,
+            halfTaxAmount,
         };
     },
 });
