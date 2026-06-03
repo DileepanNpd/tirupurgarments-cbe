@@ -320,25 +320,6 @@ class Common
         }
     }
 
-    public static function updateTransactionNumber($orderId)
-    {
-        $order = Order::find($orderId);
-
-        if ($order) {
-            $start_series = 0;
-            if($order->order_type == 'sales') {
-                $count = DB::table('payments as p')
-                            ->leftJoin('order_payments as op', 'p.id', '=', 'op.payment_id')
-                            ->where('p.payment_type', 'in')
-                            ->where('p.payment_mode_id', '>', 1)
-                            ->distinct()
-                            ->count('op.order_id');        
-                $order->invoice_number = 'SALE-'.($start_series + $count);
-                $order->save();
-            }
-        }
-    }
-
     public static function uploadFile($request)
     {
         $folder = $request->folder;
@@ -708,13 +689,13 @@ class Common
         }
     }
 
-    public static function getTransactionNumber($type, $number, $gstFlag = 0)
+    public static function getTransactionNumber($type, $number)
     {
         $prefixs = [
             'payment-in' => 'PAY-IN-',
             'payment-out' => 'PAY-OUT-',
             'quotations' => 'QUOT-',
-            'sales' => $gstFlag == 0 ? 'QUOTE-' : 'BILL-',
+            'sales' => 'SALE-',
             'purchases' => 'PUR-',
             'purchase-returns' => 'PUR-RET-',
             'sales-returns' => 'SALE-RET-',

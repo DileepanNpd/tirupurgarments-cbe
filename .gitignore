@@ -1,5 +1,3 @@
-backups/
-*.log
 /dhroad
 /node_modules
 /public/hot

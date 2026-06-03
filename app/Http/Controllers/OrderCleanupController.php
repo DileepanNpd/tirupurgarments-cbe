@@ -32,28 +32,20 @@ class OrderCleanupController extends Controller
             ]);
         }
         Log::info("Monthly Orders Cleanup");
-        $deleted = DB::table('orders as o')
-                    ->where('o.invoice_type', 'pos')
-                    ->where('o.created_at', '<', now()->startOfMonth())
-                
-                    // Must have at least one CASH payment
-                    ->whereExists(function ($q) {
-                        $q->select(DB::raw(1))
-                          ->from('order_payments as op')
-                          ->join('payments as p', 'p.id', '=', 'op.payment_id')
-                          ->whereColumn('op.order_id', 'o.id')
-                          ->where('p.payment_mode_id', 1);
-                    })
-                
-                    // Must NOT have any NON-CASH payment (ever)
-                    ->whereNotExists(function ($q) {
-                        $q->select(DB::raw(1))
-                          ->from('order_payments as op')
-                          ->join('payments as p', 'p.id', '=', 'op.payment_id')
-                          ->whereColumn('op.order_id', 'o.id')
-                          ->where('p.payment_mode_id', '!=', 1);
-                    })->delete();
+        $deleted = DB::table('orders')
+                        ->where('invoice_type', 'pos')
+                        ->where('created_at', '<', now()->subMonth()->startOfMonth()) // delete before previous month
+                        ->whereNotIn('id', function($query) {
+                            $query->select('op.order_id')
+                                  ->from('payments as p')
+                                  ->leftJoin('order_payments as op', 'p.id', '=', 'op.payment_id')
+                                  ->where('p.payment_type', 'in')
+                                  ->where('p.payment_mode_id', '>', 1)
+                                  ->where('p.date', '>', now()->subMonth()->startOfMonth()); // consistent filter
+                        })
+                        ->delete();
         Log::info("Orders Deleted: ".$deleted);
+            
         return response()->json([
             'status' => 'success',
             'deleted' => $deleted,

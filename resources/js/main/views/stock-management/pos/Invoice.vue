@@ -10,27 +10,25 @@
         <div id="pos-invoice">
             <div style="max-width: 400px; margin: 0px auto" v-if="order && order.xid">
                 <div class="company-details">
-                    <h2>Pavi Tex</h2>
-                    <h2>Tirupur Garments</h2>
-                    <div v-if="order?.invoice_number?.startsWith('SALE-')">
-                        <h2>GST: {{ selectedWarehouse.address }}</h2>
-                    </div>
+                    <!--h2>Pavi Tex</h2-->
+                    <h2>Tirupur Garments - Dharapuram</h2>
+                    <!--h2>GST: {{ selectedWarehouse.address }}</h2-->
                     <!--<h2>{{ selectedWarehouse.name }}</h2>-->
+                    <!--<h2>Direct Factory Outlet<br>[Dharapuram Road, Palladam]</h2>-->
+                    <!--<p class="company-address">-->
+                    <!--    {{ selectedWarehouse.address }}-->
+                    <!--</p>-->
                     <h4 style="margin-bottom: 0px">
                         {{ $t("common.phone") }}: {{ selectedWarehouse.phone }}
                     </h4>
                     <h4>{{ $t("common.email") }}: {{ selectedWarehouse.email }}</h4>
                 </div>
                 <div class="tax-invoice-details">
-                    <h3 class="tax-invoice-title">
-                        <div v-if="order?.invoice_number?.startsWith('SALE-')">
-                            {{ $t("sales.tax_invoice") }}
-                        </div>
-                    </h3>
+                    <h3 class="tax-invoice-title">Invoice</h3>
                     <table class="invoice-customer-details">
                         <tr>
                             <td style="width: 50%">
-                                No :
+                                {{ $t("sales.invoice") }} &nbsp;&nbsp;&nbsp;&nbsp;:
                                 {{ order.invoice_number }}
                             </td>
                             <td style="width: 50%">
@@ -110,19 +108,32 @@
                                 </td>
                             </tr>
                             <tr class="item-row-other">
-                                <td style="text-align: right; padding-right:15px;" colspan="2">MRP: {{ formatAmountCurrency(order.total_mrp) }}</td>
-                                <td style="text-align: right; padding-right:15px;" colspan="3">Sale Price: {{ formatAmountCurrency(order.subtotal) }}</td>
+                                <td style="text-align: right; padding-right:15px;" colspan="3">MRP: {{ formatAmountCurrency(order.total_mrp) }}</td>
+                                <td style="text-align: right; padding-right:0px;" colspan="3">Sale Price: {{ formatAmountCurrency(order.subtotal) }}</td>
                             </tr>
+                            <!--<tr class="item-row-other">-->
+                            <!--    <td-->
+                            <!--        :colspan="-->
+                            <!--            selectedWarehouse.show_mrp_on_invoice ? 4 : 3-->
+                            <!--        "-->
+                            <!--        style="text-align: right"-->
+                            <!--    >-->
+                            <!--        {{ $t("stock.order_tax") }}-->
+                            <!--    </td>-->
+                            <!--    <td colspan="2" style="text-align: right">-->
+                            <!--        {{ formatAmountCurrency(order.tax_amount) }}-->
+                            <!--    </td>-->
+                            <!--</tr>-->
                             <tr class="item-row-other">
                                 <td
                                     :colspan="
                                         selectedWarehouse.show_mrp_on_invoice ? 4 : 3
                                     "
-                                    style="text-align: right; padding-right:5px;"
+                                    style="text-align: right"
                                 >
                                     {{ $t("stock.discount") }}
                                 </td>
-                                <td colspan="2" style="text-align: right; padding-right:5px;">
+                                <td colspan="2" style="text-align: right">
                                     {{ formatAmountCurrency(order.discount) }}
                                 </td>
                             </tr>
@@ -135,34 +146,8 @@
                                 >
                                     {{ $t("stock.shipping") }}
                                 </td>
-                                <td colspan="2" style="text-align: right; padding-right:5px;">
+                                <td colspan="2" style="text-align: right">
                                     {{ formatAmountCurrency(order.shipping) }}
-                                </td>
-                            </tr>
-                            <tr class="item-row-other">
-                                <td
-                                    :colspan="
-                                        selectedWarehouse.show_mrp_on_invoice ? 4 : 3
-                                    "
-                                    style="text-align: right; padding-right:5px; "
-                                >
-                                    CGST 2.5%
-                                </td>
-                                <td colspan="2" style="text-align: right; padding-right:5px;">
-                                    {{ formatAmountCurrency(halfTaxAmount) }}
-                                </td>
-                            </tr>
-                            <tr class="item-row-other">
-                                <td
-                                    :colspan="
-                                        selectedWarehouse.show_mrp_on_invoice ? 4 : 3
-                                    "
-                                    style="text-align: right; padding-right:5px; "
-                                >
-                                    SGST 2.5%
-                                </td>
-                                <td colspan="2" style="text-align: right; padding-right:5px;">
-                                    {{ formatAmountCurrency(halfTaxAmount) }}
                                 </td>
                             </tr>
                         </tbody>
@@ -190,7 +175,7 @@
                         </tr>
                     </table>
                 </div>
-                <div v-if="order?.invoice_number?.startsWith('SALE-')" class="paid-amount-deatils">
+                <div class="paid-amount-deatils">
                     <table style="width: 100%">
                         <thead style="background: #eee">
                             <td style="width: 50%">{{ $t("payments.paid_amount") }}</td>
@@ -204,7 +189,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div v-if="order?.invoice_number?.startsWith('SALE-')">
+                <div>
                     <table style="width: 100%">
                         <tr style="text-align: center">
                             <td style="width: 100%">
@@ -259,20 +244,11 @@
                         {{ $t("invoice.total_discount") }} :
                         {{ order.saving_percentage }}%
                     </p>
-                    <p>
-                        {{ $t("invoice.total_tax") }} :
-                        {{ formatAmountCurrency(order.total_tax_on_items) }}
-                    </p>
+                    <!--<p>-->
+                    <!--    {{ $t("invoice.total_tax") }} :-->
+                    <!--    {{ formatAmountCurrency(order.total_tax_on_items) }}-->
+                    <!--</p>-->
                 </div>
-
-                <!-- UPI Payment QR -->
-                <div style="text-align: center; margin-top: 12px; padding: 8px 0; border-top: 1px dashed #ccc;">
-                    <p style="font-size: 12px; margin-bottom: 4px; font-weight: 600;">Scan &amp; Pay via UPI</p>
-                    <img :src="upiLink" width="130" height="130" style="display:block; margin: 0 auto;" />
-                    <p style="font-size: 11px; margin-top: 4px; color: #555;">q069778669@ybl</p>
-                    <p style="font-size: 10px; color: #888;">GPay &middot; PhonePe &middot; Paytm &middot; BHIM</p>
-                </div>
-
             </div>
         </div>
 
@@ -290,7 +266,7 @@
 </template>
 
 <script>
-import { ref, defineComponent, computed } from "vue";
+import { ref, defineComponent } from "vue";
 import { PrinterOutlined } from "@ant-design/icons-vue";
 import common from "../../../../common/composable/common";
 import BarcodeGenerator from "../../../../common/components/barcode/BarcodeGenerator.vue";
@@ -321,39 +297,8 @@ export default defineComponent({
             newWindow.document.write(invoiceContent);
             newWindow.document.write("</body></html>");
             newWindow.document.close();
-            // Wait for all images (including QR) to load before printing
-            var images = newWindow.document.images;
-            if (images.length === 0) {
-                newWindow.print();
-            } else {
-                var loaded = 0;
-                var total = images.length;
-                var doPrint = () => {
-                    loaded++;
-                    if (loaded >= total) newWindow.print();
-                };
-                for (var i = 0; i < images.length; i++) {
-                    if (images[i].complete) {
-                        doPrint();
-                    } else {
-                        images[i].onload  = doPrint;
-                        images[i].onerror = doPrint; // print anyway if image fails
-                    }
-                }
-            }
+            newWindow.print();
         };
-
-        const upiLink = computed(() => {
-            const amount = props.order?.total ? parseFloat(props.order.total).toFixed(2) : "0.00";
-            const data = `upi://pay?pa=q069778669@ybl&pn=Pavi%20Tex&am=${amount}&cu=INR&tn=Invoice%20${props.order?.invoice_number || ""}`;
-            return `https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=${encodeURIComponent(data)}`;
-        });
-
-        // Half of the order tax — used to display CGST and SGST separately on the invoice
-        const halfTaxAmount = computed(() => {
-            const total = parseFloat(props.order?.tax_amount);
-            return isNaN(total) ? 0 : total / 2;
-        });
 
         return {
             onClose,
@@ -361,12 +306,11 @@ export default defineComponent({
             selectedWarehouse,
             formatAmountCurrency,
             printInvoice,
-            upiLink,
-            halfTaxAmount,
         };
     },
 });
 </script>
+
 <style scoped>
 table {
     border-collapse: collapse;

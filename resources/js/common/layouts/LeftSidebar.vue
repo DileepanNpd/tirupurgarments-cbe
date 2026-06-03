@@ -36,6 +36,8 @@
                     paddingBottom: '20px',
                     marginLeft: appSetting.rtl ? '0px' : '10px',
                     marginRight: appSetting.rtl ? '10px' : '0px',
+                    margin: '0 auto', 
+                    display: 'block', 
                 }"
                 :src="
                     appSetting.left_sidebar_theme == 'dark'

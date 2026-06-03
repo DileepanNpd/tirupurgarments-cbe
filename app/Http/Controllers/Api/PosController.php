@@ -77,7 +77,6 @@ class PosController extends ApiBaseController
 
                 if ($product->sales_tax_type == 'inclusive') {
                     $subTotal = $singleUnitPrice;
-                    
                     $singleUnitPrice =  ($singleUnitPrice * 100) / (100 + $taxRate);
                     $taxAmount = ($singleUnitPrice) * ($taxRate / 100);
                 } else {
@@ -128,7 +127,6 @@ class PosController extends ApiBaseController
 
     public function savePosPayments()
     {
-        $gstFlag = 0;
         $request = request();
         $loggedInUser = user();
         $warehouse = warehouse();
@@ -157,7 +155,7 @@ class PosController extends ApiBaseController
         $order->staff_user_id = $loggedInUser->id;
         $order->save();
 
-        $order->invoice_number = Common::getTransactionNumber($order->order_type, number: $order->id);
+        $order->invoice_number = Common::getTransactionNumber($order->order_type, $order->id);
         $order->save();
 
         Common::storeAndUpdateOrder($order, $oldOrderId);
@@ -167,7 +165,6 @@ class PosController extends ApiBaseController
         foreach ($allPayments as $allPayment) {
             // Save Order Payment
             if ($allPayment['amount'] > 0 && $allPayment['payment_mode_id'] != '') {
-                
                 $payment = new Payment();
                 $payment->warehouse_id = $warehouse->id;
                 $payment->payment_type = "in";
@@ -178,10 +175,6 @@ class PosController extends ApiBaseController
                 $payment->notes = $allPayment['notes'];
                 $payment->user_id = $order->user_id;
                 $payment->save();
-
-                if($payment->payment_mode_id != 1) {
-                    $gstFlag = 1;
-                }
 
                 // Generate and save payment number
                 $paymentType = 'payment-' . $payment->payment_type;
@@ -195,12 +188,9 @@ class PosController extends ApiBaseController
                 $orderPayment->save();
             }
         }
-
+        
         Common::updateOrderAmount($order->id);
-        if($gstFlag == 1) {
-            Common::updateTransactionNumber($order->id);
-        }
-
+        
         $savedOrder = Order::select('id', 'unique_id', 'invoice_number', 'user_id', 'staff_user_id', 'order_date', 'discount', 'shipping', 'tax_amount', 'subtotal', 'total', 'paid_amount', 'due_amount', 'total_items', 'total_quantity')
             ->with(['user:id,name', 'items:id,order_id,product_id,unit_id,unit_price,subtotal,quantity,mrp,total_tax', 'items.product:id,name', 'items.unit:id,name,short_name', 'orderPayments:id,order_id,payment_id,amount', 'orderPayments.payment:id,payment_mode_id', 'orderPayments.payment.paymentMode:id,name', 'staffMember:id,name'])
             ->find($order->id);
